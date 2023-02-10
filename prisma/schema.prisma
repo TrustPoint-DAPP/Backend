@@ -13,8 +13,8 @@ datasource db {
 model Organization {
   id                String  @id
   admin             String  @unique
-  name              String
-  imageCID          String
+  name              String?
+  imageCID          String?
   nonce             String
   description       String?
   video             String?

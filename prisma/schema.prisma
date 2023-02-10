@@ -12,7 +12,7 @@ datasource db {
 
 model Organization {
   id                String  @id
-  admin             String
+  admin             String  @unique
   name              String
   imageCID          String
   nonce             String

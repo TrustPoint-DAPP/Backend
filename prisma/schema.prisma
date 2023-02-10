@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Organization {
-  id                String  @id
+  id                Int     @id @default(autoincrement())
   admin             String  @unique
   name              String?
   imageCID          String?
   nonce             String
-  description       String?
+  description       String? @db.LongText
   video             String?
   email             String?
   locked            Boolean @default(false)
@@ -32,7 +32,7 @@ model OrganizationAdminChange {
   logIndex         Int
   oldAdmin         String
   newAdmin         String
-  orgId            String
+  orgId            Int
   org              Organization @relation(fields: [orgId], references: [id])
 
   @@id([transactionHash, blockNumber, transactionIndex, logIndex])

@@ -21,6 +21,7 @@ model Organization {
   email             String?
   locked            Boolean @default(false)
   lockedBlockNumber Int?
+  registered        Boolean @default(false)
 
   OrganizationAdminChange OrganizationAdminChange[]
 }

@@ -19,6 +19,13 @@ orgAuthRouter.get("/nonce/:address", async (req, res) => {
   const { address } = req.params;
 
   // check if celeb account is there with the same address
+  const celeb = await prisma.celeb.findFirst({
+    where: { address, registered: true },
+  });
+  if (celeb)
+    return res
+      .status(400)
+      .json({ message: "a celebrity account exists with this address" });
 
   let organization = await prisma.organization.findUnique({
     where: { admin: address },
@@ -52,6 +59,13 @@ orgAuthRouter.post(
     const { name, description, address, signature } = req.body;
     const file = req.file as Express.Multer.File;
     // check if celeb account is there with the same address
+    const celeb = await prisma.celeb.findFirst({
+      where: { address, registered: true },
+    });
+    if (celeb)
+      return res
+        .status(400)
+        .json({ message: "a celebrity account exists with this address" });
 
     const organization = await prisma.organization.findUnique({
       where: { admin: address },

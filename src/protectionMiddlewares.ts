@@ -1,4 +1,4 @@
-import { Organization, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { verifyJWTToken } from "./helpers";
 
@@ -44,8 +44,15 @@ export async function onlyAuthorized(
     return next();
   }
 
-  // TODO: make celeb flow
-  console.error("Celeb auth flow not implemented yet");
+  const celeb = await prisma.celeb.findUnique({
+    where: { address: decoded.username },
+  });
+  if (!celeb)
+    return res.status(401).json({
+      message: "The celebrity associated to this authorization token not found",
+    });
+  (req as any).celeb = celeb;
+  return next();
 }
 
 export async function onlyAuthorizedOrganization(

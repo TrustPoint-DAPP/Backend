@@ -38,3 +38,16 @@ model OrganizationAdminChange {
 
   @@id([transactionHash, blockNumber, transactionIndex, logIndex])
 }
+
+model Celeb {
+  id         Int       @id @default(autoincrement())
+  address    String    @unique
+  nonce      String
+  name       String?
+  imageCID   String?
+  dob        DateTime?
+  email      String?
+  bio        String?   @db.LongText
+  verified   Boolean   @default(false)
+  registered Boolean   @default(false)
+}

@@ -134,14 +134,16 @@ enum TransferType {
 }
 
 model NFTTranfer {
-  tokenId     Int
-  blockNumber Int
-  logIndex    Int
-  from        String
-  to          String
-  value       Int
-  type        TransferType
-  nft         Nft          @relation(fields: [tokenId], references: [tokenId])
+  tokenId          Int
+  blockNumber      Int
+  transactionHash  String
+  transactionIndex Int
+  logIndex         Int
+  from             String
+  to               String
+  value            Int
+  type             TransferType
+  nft              Nft          @relation(fields: [tokenId], references: [tokenId])
 
   @@id([tokenId, blockNumber, logIndex, type])
 }

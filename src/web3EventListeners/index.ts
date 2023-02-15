@@ -13,6 +13,7 @@ import {
   Logger,
   OrganizationController,
 } from "../typechain-types";
+import dealControllerEventListeners from "./eventListeners/dealController";
 
 const organizationController = new ethers.Contract(
   ORGANIZATION_CONTRACT_ADDRESS,
@@ -32,4 +33,6 @@ const logger = new ethers.Contract(
   provider
 ) as Logger;
 
-export default async function web3EventListeners() {}
+export default async function web3EventListeners() {
+  dealControllerEventListeners(dealController);
+}

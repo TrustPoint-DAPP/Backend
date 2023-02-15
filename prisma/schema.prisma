@@ -20,7 +20,7 @@ model Organization {
   video             String?
   email             String?
   locked            Boolean @default(false)
-  nftContract       String?
+  nftContract       String? @unique
   lockedBlockNumber Int?
   registered        Boolean @default(false)
 

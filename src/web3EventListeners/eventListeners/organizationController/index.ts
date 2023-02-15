@@ -22,7 +22,7 @@ export default async function organizationControllerEventListeners(
   );
   organizationController.on(
     CreateOrganizationFilter,
-    (_orgId, _adminAddress, eventEmitted) => {
+    (_orgId, _adminAddress, _nftContract, eventEmitted) => {
       createOrganizationHandler(eventEmitted);
     }
   );

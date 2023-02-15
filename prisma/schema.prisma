@@ -28,16 +28,14 @@ model Organization {
 }
 
 model OrganizationAdminChange {
-  transactionHash  String
-  blockNumber      Int
-  transactionIndex Int
-  logIndex         Int
-  oldAdmin         String
-  newAdmin         String
-  orgId            Int
-  org              Organization @relation(fields: [orgId], references: [id])
+  blockNumber Int
+  logIndex    Int
+  oldAdmin    String
+  newAdmin    String
+  orgId       Int
+  org         Organization @relation(fields: [orgId], references: [id])
 
-  @@id([transactionHash, blockNumber, transactionIndex, logIndex])
+  @@id([blockNumber, logIndex])
 }
 
 model Celeb {

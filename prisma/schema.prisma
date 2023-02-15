@@ -99,6 +99,7 @@ model Nft {
   cid                   String
   royaltyBasisPoints    Int
   orgRoyaltyBasisPoints Int
+  totalSupply           Int         @default(0)
   royaltySplitter       String?
   created               Boolean     @default(false)
   metadata              NFTMetadata @relation(fields: [cid], references: [cid])
@@ -124,4 +125,21 @@ model BlockchainSync {
   type             BlockchainSyncTypes
 
   @@id([blockNumber, transactionHash, transactionIndex, logIndex])
+}
+
+enum TransferType {
+  Single
+  Batch
+}
+
+model NFTTranfer {
+  tokenId     Int
+  blockNumber Int
+  logIndex    Int
+  from        String
+  to          String
+  value       Int
+  type        TransferType
+
+  @@id([tokenId, blockNumber, logIndex, type])
 }

@@ -44,8 +44,6 @@ export default async function adminChangeHandler(
     data: {
       blockNumber,
       logIndex,
-      transactionIndex,
-      transactionHash,
       oldAdmin,
       newAdmin,
       org: {

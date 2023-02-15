@@ -28,6 +28,70 @@ import type {
   PromiseOrValue,
 } from "../../common";
 
+export declare namespace DealController {
+  export type DealStruct = {
+    id: PromiseOrValue<BigNumberish>;
+    orgId: PromiseOrValue<BigNumberish>;
+    oneOffPayment: PromiseOrValue<BigNumberish>;
+    noOfNFTs: PromiseOrValue<BigNumberish>;
+    counterParty: PromiseOrValue<string>;
+    orgRoyaltyReceiver: PromiseOrValue<string>;
+    done: PromiseOrValue<boolean>;
+    cancelled: PromiseOrValue<boolean>;
+  };
+
+  export type DealStructOutput = [
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    string,
+    string,
+    boolean,
+    boolean
+  ] & {
+    id: BigNumber;
+    orgId: BigNumber;
+    oneOffPayment: BigNumber;
+    noOfNFTs: BigNumber;
+    counterParty: string;
+    orgRoyaltyReceiver: string;
+    done: boolean;
+    cancelled: boolean;
+  };
+
+  export type NFTStruct = {
+    id: PromiseOrValue<BigNumberish>;
+    dealId: PromiseOrValue<BigNumberish>;
+    nftCID: PromiseOrValue<string>;
+    royaltyBasisPoints: PromiseOrValue<BigNumberish>;
+    orgRoyaltyBasisPoints: PromiseOrValue<BigNumberish>;
+    royaltySplitter: PromiseOrValue<string>;
+    tokenId: PromiseOrValue<BigNumberish>;
+    created: PromiseOrValue<boolean>;
+  };
+
+  export type NFTStructOutput = [
+    BigNumber,
+    BigNumber,
+    string,
+    BigNumber,
+    BigNumber,
+    string,
+    BigNumber,
+    boolean
+  ] & {
+    id: BigNumber;
+    dealId: BigNumber;
+    nftCID: string;
+    royaltyBasisPoints: BigNumber;
+    orgRoyaltyBasisPoints: BigNumber;
+    royaltySplitter: string;
+    tokenId: BigNumber;
+    created: boolean;
+  };
+}
+
 export interface DealControllerInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
@@ -279,7 +343,9 @@ export interface DealControllerInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 
   events: {
-    "CreateOrganization(uint256,address)": EventFragment;
+    "DealCancelled(uint256,uint256,address)": EventFragment;
+    "DealCompleted(uint256,uint256,address,uint256[],uint256[],address[])": EventFragment;
+    "DealCreated(tuple,tuple[])": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
@@ -287,7 +353,9 @@ export interface DealControllerInterface extends utils.Interface {
     "Unpaused(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "CreateOrganization"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DealCancelled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DealCompleted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DealCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
@@ -295,17 +363,43 @@ export interface DealControllerInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
-export interface CreateOrganizationEventObject {
-  orgId: BigNumber;
-  adminAddress: string;
+export interface DealCancelledEventObject {
+  dealId: BigNumber;
+  organizationId: BigNumber;
+  counterParty: string;
 }
-export type CreateOrganizationEvent = TypedEvent<
-  [BigNumber, string],
-  CreateOrganizationEventObject
+export type DealCancelledEvent = TypedEvent<
+  [BigNumber, BigNumber, string],
+  DealCancelledEventObject
 >;
 
-export type CreateOrganizationEventFilter =
-  TypedEventFilter<CreateOrganizationEvent>;
+export type DealCancelledEventFilter = TypedEventFilter<DealCancelledEvent>;
+
+export interface DealCompletedEventObject {
+  dealId: BigNumber;
+  organizationId: BigNumber;
+  counterParty: string;
+  nftIds: BigNumber[];
+  tokenIds: BigNumber[];
+  royaltyReceivers: string[];
+}
+export type DealCompletedEvent = TypedEvent<
+  [BigNumber, BigNumber, string, BigNumber[], BigNumber[], string[]],
+  DealCompletedEventObject
+>;
+
+export type DealCompletedEventFilter = TypedEventFilter<DealCompletedEvent>;
+
+export interface DealCreatedEventObject {
+  deal: DealController.DealStructOutput;
+  nfts: DealController.NFTStructOutput[];
+}
+export type DealCreatedEvent = TypedEvent<
+  [DealController.DealStructOutput, DealController.NFTStructOutput[]],
+  DealCreatedEventObject
+>;
+
+export type DealCreatedEventFilter = TypedEventFilter<DealCreatedEvent>;
 
 export interface PausedEventObject {
   account: string;
@@ -886,14 +980,39 @@ export interface DealController extends BaseContract {
   };
 
   filters: {
-    "CreateOrganization(uint256,address)"(
-      orgId?: null,
-      adminAddress?: null
-    ): CreateOrganizationEventFilter;
-    CreateOrganization(
-      orgId?: null,
-      adminAddress?: null
-    ): CreateOrganizationEventFilter;
+    "DealCancelled(uint256,uint256,address)"(
+      dealId?: PromiseOrValue<BigNumberish> | null,
+      organizationId?: PromiseOrValue<BigNumberish> | null,
+      counterParty?: PromiseOrValue<string> | null
+    ): DealCancelledEventFilter;
+    DealCancelled(
+      dealId?: PromiseOrValue<BigNumberish> | null,
+      organizationId?: PromiseOrValue<BigNumberish> | null,
+      counterParty?: PromiseOrValue<string> | null
+    ): DealCancelledEventFilter;
+
+    "DealCompleted(uint256,uint256,address,uint256[],uint256[],address[])"(
+      dealId?: PromiseOrValue<BigNumberish> | null,
+      organizationId?: PromiseOrValue<BigNumberish> | null,
+      counterParty?: PromiseOrValue<string> | null,
+      nftIds?: null,
+      tokenIds?: null,
+      royaltyReceivers?: null
+    ): DealCompletedEventFilter;
+    DealCompleted(
+      dealId?: PromiseOrValue<BigNumberish> | null,
+      organizationId?: PromiseOrValue<BigNumberish> | null,
+      counterParty?: PromiseOrValue<string> | null,
+      nftIds?: null,
+      tokenIds?: null,
+      royaltyReceivers?: null
+    ): DealCompletedEventFilter;
+
+    "DealCreated(tuple,tuple[])"(
+      deal?: null,
+      nfts?: null
+    ): DealCreatedEventFilter;
+    DealCreated(deal?: null, nfts?: null): DealCreatedEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;

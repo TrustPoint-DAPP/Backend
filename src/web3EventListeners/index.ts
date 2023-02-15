@@ -15,6 +15,7 @@ import {
 } from "../typechain-types";
 import dealControllerEventListeners from "./eventListeners/dealController";
 import organizationControllerEventListeners from "./eventListeners/organizationController";
+import loggerEventListeners from "./eventListeners/logger";
 
 const organizationController = new ethers.Contract(
   ORGANIZATION_CONTRACT_ADDRESS,
@@ -37,4 +38,5 @@ const logger = new ethers.Contract(
 export default async function web3EventListeners() {
   await dealControllerEventListeners(dealController);
   await organizationControllerEventListeners(organizationController);
+  await loggerEventListeners(logger);
 }

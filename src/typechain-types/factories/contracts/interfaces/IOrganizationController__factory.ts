@@ -70,6 +70,12 @@ const _abi = [
         name: "adminAddress",
         type: "address",
       },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "nftContract",
+        type: "address",
+      },
     ],
     name: "CreateOrganization",
     type: "event",

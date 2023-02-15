@@ -223,7 +223,7 @@ export interface OrganizationControllerInterface extends utils.Interface {
 
   events: {
     "AdminUpdated(uint256,address,address)": EventFragment;
-    "CreateOrganization(uint256,address)": EventFragment;
+    "CreateOrganization(uint256,address,address)": EventFragment;
     "OrganizationLocked(uint256)": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
@@ -257,9 +257,10 @@ export type AdminUpdatedEventFilter = TypedEventFilter<AdminUpdatedEvent>;
 export interface CreateOrganizationEventObject {
   orgId: BigNumber;
   adminAddress: string;
+  nftContract: string;
 }
 export type CreateOrganizationEvent = TypedEvent<
-  [BigNumber, string],
+  [BigNumber, string, string],
   CreateOrganizationEventObject
 >;
 
@@ -669,13 +670,15 @@ export interface OrganizationController extends BaseContract {
       newAdmin?: PromiseOrValue<string> | null
     ): AdminUpdatedEventFilter;
 
-    "CreateOrganization(uint256,address)"(
+    "CreateOrganization(uint256,address,address)"(
       orgId?: PromiseOrValue<BigNumberish> | null,
-      adminAddress?: PromiseOrValue<string> | null
+      adminAddress?: PromiseOrValue<string> | null,
+      nftContract?: PromiseOrValue<string> | null
     ): CreateOrganizationEventFilter;
     CreateOrganization(
       orgId?: PromiseOrValue<BigNumberish> | null,
-      adminAddress?: PromiseOrValue<string> | null
+      adminAddress?: PromiseOrValue<string> | null,
+      nftContract?: PromiseOrValue<string> | null
     ): CreateOrganizationEventFilter;
 
     "OrganizationLocked(uint256)"(

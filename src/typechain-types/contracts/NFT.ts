@@ -275,6 +275,7 @@ export interface NFTInterface extends utils.Interface {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
+    "PermanentURI(string,uint256)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
     "URI(string,uint256)": EventFragment;
@@ -284,6 +285,7 @@ export interface NFTInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PermanentURI"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
@@ -320,6 +322,17 @@ export interface PausedEventObject {
 export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
 export type PausedEventFilter = TypedEventFilter<PausedEvent>;
+
+export interface PermanentURIEventObject {
+  _value: string;
+  _id: BigNumber;
+}
+export type PermanentURIEvent = TypedEvent<
+  [string, BigNumber],
+  PermanentURIEventObject
+>;
+
+export type PermanentURIEventFilter = TypedEventFilter<PermanentURIEvent>;
 
 export interface TransferBatchEventObject {
   operator: string;
@@ -813,6 +826,15 @@ export interface NFT extends BaseContract {
 
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
+
+    "PermanentURI(string,uint256)"(
+      _value?: null,
+      _id?: PromiseOrValue<BigNumberish> | null
+    ): PermanentURIEventFilter;
+    PermanentURI(
+      _value?: null,
+      _id?: PromiseOrValue<BigNumberish> | null
+    ): PermanentURIEventFilter;
 
     "TransferBatch(address,address,address,uint256[],uint256[])"(
       operator?: PromiseOrValue<string> | null,

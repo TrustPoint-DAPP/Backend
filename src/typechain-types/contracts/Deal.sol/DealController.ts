@@ -381,7 +381,7 @@ export interface DealCompletedEventObject {
   counterParty: string;
   nftIds: BigNumber[];
   tokenIds: BigNumber[];
-  royaltyReceivers: string[];
+  royaltyReceiver: string[];
 }
 export type DealCompletedEvent = TypedEvent<
   [BigNumber, BigNumber, string, BigNumber[], BigNumber[], string[]],
@@ -997,7 +997,7 @@ export interface DealController extends BaseContract {
       counterParty?: PromiseOrValue<string> | null,
       nftIds?: null,
       tokenIds?: null,
-      royaltyReceivers?: null
+      royaltyReceiver?: null
     ): DealCompletedEventFilter;
     DealCompleted(
       dealId?: PromiseOrValue<BigNumberish> | null,
@@ -1005,7 +1005,7 @@ export interface DealController extends BaseContract {
       counterParty?: PromiseOrValue<string> | null,
       nftIds?: null,
       tokenIds?: null,
-      royaltyReceivers?: null
+      royaltyReceiver?: null
     ): DealCompletedEventFilter;
 
     "DealCreated(tuple,tuple[])"(

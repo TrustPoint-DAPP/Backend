@@ -23,7 +23,8 @@ model Organization {
   lockedBlockNumber Int?
   registered        Boolean @default(false)
 
-  OrganizationAdminChange OrganizationAdminChange[]
+  adminChanges OrganizationAdminChange[]
+  deals        Deal[]
 }
 
 model OrganizationAdminChange {
@@ -50,4 +51,77 @@ model Celeb {
   bio        String?   @db.LongText
   verified   Boolean   @default(false)
   registered Boolean   @default(false)
+  Deal       Deal[]
+}
+
+model NFTAttribute {
+  metadataCID  String
+  trait_type   String
+  value        String
+  display_type String?
+
+  metadata NFTMetadata @relation(fields: [metadataCID], references: [cid])
+
+  @@id([metadataCID, trait_type])
+}
+
+model NFTMetadata {
+  cid           String  @id
+  image         String
+  name          String
+  description   String
+  animationURL  String?
+  external_url  String?
+  animation_url String?
+
+  attributes NFTAttribute[]
+  nfts       Nft[]
+}
+
+model Deal {
+  id                Int          @id
+  celebAddress      String
+  oneOffFees        String
+  orgId             Int
+  orgRoyaltyReceier String
+  done              Boolean      @default(false)
+  cancelled         Boolean      @default(false)
+  org               Organization @relation(fields: [orgId], references: [id])
+  celeb             Celeb        @relation(fields: [celebAddress], references: [address])
+
+  nfts Nft[]
+}
+
+model Nft {
+  id                    Int         @id
+  tokenId               Int?
+  dealId                Int
+  cid                   String
+  royaltyBasisPoints    Int
+  orgRoyaltyBasisPoints Int
+  royaltySplitter       String?
+  created               Boolean     @default(false)
+  metadata              NFTMetadata @relation(fields: [cid], references: [cid])
+  deal                  Deal        @relation(fields: [dealId], references: [id])
+}
+
+enum BlockchainSyncTypes {
+  DealCreated
+  DealCompleted
+  DealCancelled
+  NFTSingleTransfer
+  NFTBatchTransfer
+  OrganizationCreated
+  OrganizationLocked
+  OrganizationAdminChanged
+}
+
+model BlockchainSync {
+  blockNumber      Int
+  transactionHash  String
+  transactionIndex Int
+  logIndex         Int
+  type             BlockchainSyncTypes
+
+  @@id([blockNumber, transactionHash, transactionIndex, logIndex])
 }

@@ -93,7 +93,7 @@ model Deal {
 
 model Nft {
   id                    Int         @id
-  tokenId               Int?
+  tokenId               Int?        @unique
   dealId                Int
   cid                   String
   royaltyBasisPoints    Int
@@ -103,6 +103,8 @@ model Nft {
   created               Boolean     @default(false)
   metadata              NFTMetadata @relation(fields: [cid], references: [cid])
   deal                  Deal        @relation(fields: [dealId], references: [id])
+
+  NFTTranfer NFTTranfer[]
 }
 
 enum BlockchainSyncTypes {
@@ -139,6 +141,7 @@ model NFTTranfer {
   to          String
   value       Int
   type        TransferType
+  nft         Nft          @relation(fields: [tokenId], references: [tokenId])
 
   @@id([tokenId, blockNumber, logIndex, type])
 }

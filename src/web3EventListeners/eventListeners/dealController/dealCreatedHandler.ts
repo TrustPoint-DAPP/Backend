@@ -1,4 +1,5 @@
 import { BlockchainSyncTypes, PrismaClient } from "@prisma/client";
+import { checkAndCreateSync } from "../../../helpers";
 import { DealCreatedEvent } from "../../../typechain-types/contracts/Deal.sol/DealController";
 
 const prisma = new PrismaClient();
@@ -15,27 +16,16 @@ export default async function dealCreatedHandler(
   });
   if (dealObj) return;
 
-  const sync = await prisma.blockchainSync.findUnique({
-    where: {
-      blockNumber_transactionHash_transactionIndex_logIndex: {
-        blockNumber,
-        transactionHash,
-        transactionIndex,
-        logIndex,
-      },
-    },
-  });
-  if (sync) return;
-
-  await prisma.blockchainSync.create({
-    data: {
-      type: BlockchainSyncTypes.DealCreated,
+  if (
+    !(await checkAndCreateSync(
       blockNumber,
       transactionHash,
       transactionIndex,
       logIndex,
-    },
-  });
+      BlockchainSyncTypes.DealCreated
+    ))
+  )
+    return;
 
   // TODO: check if organization and celeb exists in the database or not, if not then create them in the database
 

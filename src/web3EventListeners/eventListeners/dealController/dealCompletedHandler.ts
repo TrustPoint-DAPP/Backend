@@ -1,4 +1,5 @@
 import { BlockchainSyncTypes, PrismaClient } from "@prisma/client";
+import { checkAndCreateSync } from "../../../helpers";
 import { DealCompletedEvent } from "../../../typechain-types/contracts/Deal.sol/DealController";
 
 const prisma = new PrismaClient();
@@ -15,27 +16,16 @@ export default async function dealCompletedHandler(
   });
   if (!dealObj || dealObj.done) return;
 
-  const sync = await prisma.blockchainSync.findUnique({
-    where: {
-      blockNumber_transactionHash_transactionIndex_logIndex: {
-        blockNumber,
-        transactionHash,
-        transactionIndex,
-        logIndex,
-      },
-    },
-  });
-  if (sync) return;
-
-  await prisma.blockchainSync.create({
-    data: {
-      type: BlockchainSyncTypes.DealCompleted,
+  if (
+    !(await checkAndCreateSync(
       blockNumber,
       transactionHash,
       transactionIndex,
       logIndex,
-    },
-  });
+      BlockchainSyncTypes.DealCompleted
+    ))
+  )
+    return;
 
   for (let i = 0; i < nftIds.length; i++) {
     const nftId = Number(nftIds[i]);

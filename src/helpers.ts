@@ -99,3 +99,34 @@ export async function syncEventsTillNow(
     await handler(eventEmitted);
   }
 }
+
+export async function checkAndCreateSync(
+  blockNumber: number,
+  transactionHash: string,
+  transactionIndex: number,
+  logIndex: number,
+  type: BlockchainSyncTypes
+) {
+  const sync = await prisma.blockchainSync.findUnique({
+    where: {
+      blockNumber_transactionHash_transactionIndex_logIndex: {
+        blockNumber,
+        transactionHash,
+        transactionIndex,
+        logIndex,
+      },
+    },
+  });
+  if (sync) return false;
+
+  await prisma.blockchainSync.create({
+    data: {
+      type,
+      blockNumber,
+      transactionHash,
+      transactionIndex,
+      logIndex,
+    },
+  });
+  return true;
+}

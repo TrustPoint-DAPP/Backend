@@ -1,15 +1,19 @@
-import { ethers } from "ethers";
+import { Contract, ethers, EventFilter } from "ethers";
 import {
   JWT_SECRET,
   LIGHTHOUSE_API_KEY,
+  MIN_BLOCK,
   NONCE_TEMPLATE,
   SIGNER_PRIVATE_KEY,
 } from "./config";
 import multer from "multer";
 import lighthouse from "@lighthouse-web3/sdk";
 import jwt from "jsonwebtoken";
+import { BlockchainSyncTypes, PrismaClient } from "@prisma/client";
 
 const storage = multer.memoryStorage();
+const prisma = new PrismaClient();
+
 export const multerUploader = multer({ storage: storage });
 
 export function getNonceMessage(nonce: string) {
@@ -77,4 +81,21 @@ export async function uploadJSONtoIPFS(obj: any) {
     "application/json"
   );
   return res.data;
+}
+
+export async function syncEventsTillNow(
+  contract: Contract,
+  type: BlockchainSyncTypes,
+  filter: EventFilter,
+  handler: Function
+) {
+  const lastSync = await prisma.blockchainSync.findFirst({
+    where: { type },
+    orderBy: { blockNumber: "desc" },
+  });
+  const lastBlock = lastSync?.blockNumber || MIN_BLOCK;
+  const emittedEvents = await contract.queryFilter(filter, lastBlock);
+  for (const eventEmitted of emittedEvents) {
+    await handler(eventEmitted);
+  }
 }

@@ -99,7 +99,7 @@ export interface DealControllerInterface extends utils.Interface {
     "SIGNER_ROLE()": FunctionFragment;
     "acceptDeal(uint256,address)": FunctionFragment;
     "cancelDeal(uint256)": FunctionFragment;
-    "createDeal(uint256,uint256,uint96,uint96,address,address,string,uint256,bytes)": FunctionFragment;
+    "createDeal(uint256,uint256,uint256,uint96,uint96,address,address,string,uint256,bytes)": FunctionFragment;
     "dealExists(uint256)": FunctionFragment;
     "deals(uint256)": FunctionFragment;
     "feeCollector()": FunctionFragment;
@@ -181,6 +181,7 @@ export interface DealControllerInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createDeal",
     values: [
+      PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
@@ -345,7 +346,7 @@ export interface DealControllerInterface extends utils.Interface {
   events: {
     "DealCancelled(uint256,uint256,address)": EventFragment;
     "DealCompleted(uint256,uint256,address,uint256[],uint256[],address[])": EventFragment;
-    "DealCreated(tuple,tuple[])": EventFragment;
+    "DealCreated(uint256,tuple,tuple[])": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
@@ -381,7 +382,7 @@ export interface DealCompletedEventObject {
   counterParty: string;
   nftIds: BigNumber[];
   tokenIds: BigNumber[];
-  royaltyReceiver: string[];
+  royaltyReceivers: string[];
 }
 export type DealCompletedEvent = TypedEvent<
   [BigNumber, BigNumber, string, BigNumber[], BigNumber[], string[]],
@@ -391,11 +392,16 @@ export type DealCompletedEvent = TypedEvent<
 export type DealCompletedEventFilter = TypedEventFilter<DealCompletedEvent>;
 
 export interface DealCreatedEventObject {
+  proposalId: BigNumber;
   deal: DealController.DealStructOutput;
   nfts: DealController.NFTStructOutput[];
 }
 export type DealCreatedEvent = TypedEvent<
-  [DealController.DealStructOutput, DealController.NFTStructOutput[]],
+  [
+    BigNumber,
+    DealController.DealStructOutput,
+    DealController.NFTStructOutput[]
+  ],
   DealCreatedEventObject
 >;
 
@@ -497,6 +503,7 @@ export interface DealController extends BaseContract {
     ): Promise<ContractTransaction>;
 
     createDeal(
+      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -665,6 +672,7 @@ export interface DealController extends BaseContract {
   ): Promise<ContractTransaction>;
 
   createDeal(
+    proposalId: PromiseOrValue<BigNumberish>,
     orgId: PromiseOrValue<BigNumberish>,
     amount: PromiseOrValue<BigNumberish>,
     royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -833,6 +841,7 @@ export interface DealController extends BaseContract {
     ): Promise<void>;
 
     createDeal(
+      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -997,7 +1006,7 @@ export interface DealController extends BaseContract {
       counterParty?: PromiseOrValue<string> | null,
       nftIds?: null,
       tokenIds?: null,
-      royaltyReceiver?: null
+      royaltyReceivers?: null
     ): DealCompletedEventFilter;
     DealCompleted(
       dealId?: PromiseOrValue<BigNumberish> | null,
@@ -1005,14 +1014,19 @@ export interface DealController extends BaseContract {
       counterParty?: PromiseOrValue<string> | null,
       nftIds?: null,
       tokenIds?: null,
-      royaltyReceiver?: null
+      royaltyReceivers?: null
     ): DealCompletedEventFilter;
 
-    "DealCreated(tuple,tuple[])"(
+    "DealCreated(uint256,tuple,tuple[])"(
+      proposalId?: PromiseOrValue<BigNumberish> | null,
       deal?: null,
       nfts?: null
     ): DealCreatedEventFilter;
-    DealCreated(deal?: null, nfts?: null): DealCreatedEventFilter;
+    DealCreated(
+      proposalId?: PromiseOrValue<BigNumberish> | null,
+      deal?: null,
+      nfts?: null
+    ): DealCreatedEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
@@ -1073,6 +1087,7 @@ export interface DealController extends BaseContract {
     ): Promise<BigNumber>;
 
     createDeal(
+      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -1204,6 +1219,7 @@ export interface DealController extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createDeal(
+      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,

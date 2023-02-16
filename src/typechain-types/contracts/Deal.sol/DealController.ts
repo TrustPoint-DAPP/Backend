@@ -99,7 +99,7 @@ export interface DealControllerInterface extends utils.Interface {
     "SIGNER_ROLE()": FunctionFragment;
     "acceptDeal(uint256,address)": FunctionFragment;
     "cancelDeal(uint256)": FunctionFragment;
-    "createDeal(uint256,uint256,uint256,uint96,uint96,address,address,string,uint256,bytes)": FunctionFragment;
+    "createDeal(uint256,uint256,uint96,uint96,address,address,string,uint256,bytes)": FunctionFragment;
     "dealExists(uint256)": FunctionFragment;
     "deals(uint256)": FunctionFragment;
     "feeCollector()": FunctionFragment;
@@ -181,7 +181,6 @@ export interface DealControllerInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createDeal",
     values: [
-      PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
@@ -346,7 +345,7 @@ export interface DealControllerInterface extends utils.Interface {
   events: {
     "DealCancelled(uint256,uint256,address)": EventFragment;
     "DealCompleted(uint256,uint256,address,uint256[],uint256[],address[])": EventFragment;
-    "DealCreated(uint256,tuple,tuple[])": EventFragment;
+    "DealCreated(tuple,tuple[])": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
@@ -392,16 +391,11 @@ export type DealCompletedEvent = TypedEvent<
 export type DealCompletedEventFilter = TypedEventFilter<DealCompletedEvent>;
 
 export interface DealCreatedEventObject {
-  proposalId: BigNumber;
   deal: DealController.DealStructOutput;
   nfts: DealController.NFTStructOutput[];
 }
 export type DealCreatedEvent = TypedEvent<
-  [
-    BigNumber,
-    DealController.DealStructOutput,
-    DealController.NFTStructOutput[]
-  ],
+  [DealController.DealStructOutput, DealController.NFTStructOutput[]],
   DealCreatedEventObject
 >;
 
@@ -503,7 +497,6 @@ export interface DealController extends BaseContract {
     ): Promise<ContractTransaction>;
 
     createDeal(
-      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -672,7 +665,6 @@ export interface DealController extends BaseContract {
   ): Promise<ContractTransaction>;
 
   createDeal(
-    proposalId: PromiseOrValue<BigNumberish>,
     orgId: PromiseOrValue<BigNumberish>,
     amount: PromiseOrValue<BigNumberish>,
     royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -841,7 +833,6 @@ export interface DealController extends BaseContract {
     ): Promise<void>;
 
     createDeal(
-      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -1017,16 +1008,11 @@ export interface DealController extends BaseContract {
       royaltyReceivers?: null
     ): DealCompletedEventFilter;
 
-    "DealCreated(uint256,tuple,tuple[])"(
-      proposalId?: PromiseOrValue<BigNumberish> | null,
+    "DealCreated(tuple,tuple[])"(
       deal?: null,
       nfts?: null
     ): DealCreatedEventFilter;
-    DealCreated(
-      proposalId?: PromiseOrValue<BigNumberish> | null,
-      deal?: null,
-      nfts?: null
-    ): DealCreatedEventFilter;
+    DealCreated(deal?: null, nfts?: null): DealCreatedEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
@@ -1087,7 +1073,6 @@ export interface DealController extends BaseContract {
     ): Promise<BigNumber>;
 
     createDeal(
-      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,
@@ -1219,7 +1204,6 @@ export interface DealController extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createDeal(
-      proposalId: PromiseOrValue<BigNumberish>,
       orgId: PromiseOrValue<BigNumberish>,
       amount: PromiseOrValue<BigNumberish>,
       royaltyBasisPoints: PromiseOrValue<BigNumberish>,

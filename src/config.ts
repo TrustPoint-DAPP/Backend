@@ -18,7 +18,4 @@ export const CHANNEL_PK = process.env.CHANNEL_PK || "";
 export const JWT_SECRET = process.env.JWT_SECRET || "";
 export const MIN_BLOCK = Number(process.env.MIN_BLOCK || "0");
 
-export const provider = new ethers.providers.JsonRpcProvider(
-  WEB3_RPC_URI,
-  CHAIN_ID
-);
+export const provider = new ethers.providers.WebSocketProvider(WEB3_RPC_URI);

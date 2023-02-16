@@ -4,6 +4,7 @@ import celebAuthRouter from "./routes/celebAuthRouter";
 import orgAuthRouter from "./routes/orgAuthRouter";
 import http from "http";
 import { ChatManager } from "./chatManager";
+import web3EventListeners from "./web3EventListeners";
 
 const app = express();
 const server = http.createServer(app);
@@ -19,4 +20,5 @@ app.get("/", (req, res) => {
 app.use("/org/auth", orgAuthRouter);
 app.use("/celeb/auth", celebAuthRouter);
 
+web3EventListeners();
 server.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));

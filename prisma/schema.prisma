@@ -26,6 +26,7 @@ model Organization {
 
   adminChanges OrganizationAdminChange[]
   deals        Deal[]
+  Message      Message[]
 }
 
 model OrganizationAdminChange {
@@ -34,7 +35,8 @@ model OrganizationAdminChange {
   oldAdmin    String
   newAdmin    String
   orgId       Int
-  org         Organization @relation(fields: [orgId], references: [id])
+
+  org Organization @relation(fields: [orgId], references: [id])
 
   @@id([blockNumber, logIndex])
 }
@@ -50,7 +52,9 @@ model Celeb {
   bio        String?   @db.LongText
   verified   Boolean   @default(false)
   registered Boolean   @default(false)
-  Deal       Deal[]
+
+  deals   Deal[]
+  Message Message[]
 }
 
 model NFTAttribute {
@@ -78,33 +82,37 @@ model NFTMetadata {
 }
 
 model Deal {
-  id                Int          @id
+  id                Int     @id
   celebAddress      String
   oneOffFees        String
   orgId             Int
   orgRoyaltyReceier String
-  done              Boolean      @default(false)
-  cancelled         Boolean      @default(false)
-  org               Organization @relation(fields: [orgId], references: [id])
-  celeb             Celeb        @relation(fields: [celebAddress], references: [address])
+  done              Boolean @default(false)
+  cancelled         Boolean @default(false)
+  proposalId        Int     @unique
 
-  nfts Nft[]
+  org   Organization @relation(fields: [orgId], references: [id])
+  celeb Celeb        @relation(fields: [celebAddress], references: [address])
+
+  nfts    Nft[]
+  Message Message[]
 }
 
 model Nft {
-  id                    Int         @id
-  tokenId               Int?        @unique
+  id                    Int     @id
+  tokenId               Int?    @unique
   dealId                Int
   cid                   String
   royaltyBasisPoints    Int
   orgRoyaltyBasisPoints Int
-  totalSupply           Int         @default(0)
+  totalSupply           Int     @default(0)
   royaltySplitter       String?
-  created               Boolean     @default(false)
-  metadata              NFTMetadata @relation(fields: [cid], references: [cid])
-  deal                  Deal        @relation(fields: [dealId], references: [id])
+  created               Boolean @default(false)
 
-  NFTTranfer NFTTranfer[]
+  metadata NFTMetadata @relation(fields: [cid], references: [cid])
+  deal     Deal        @relation(fields: [dealId], references: [id])
+
+  transfers NFTTranfer[]
 }
 
 enum BlockchainSyncTypes {
@@ -143,7 +151,38 @@ model NFTTranfer {
   to               String
   value            Int
   type             TransferType
-  nft              Nft          @relation(fields: [tokenId], references: [tokenId])
+
+  nft Nft @relation(fields: [tokenId], references: [tokenId])
 
   @@id([tokenId, blockNumber, logIndex, type])
+}
+
+enum MessageType {
+  IMAGE
+  VIDEO
+  DEAL
+  TEXT
+}
+
+enum SenderType {
+  ORGANIZATION
+  CELEB
+}
+
+model Message {
+  id        Int         @id @default(autoincrement())
+  orgId     Int
+  celebId   Int
+  unread    Boolean
+  type      MessageType
+  sender    SenderType
+  text      String?     @db.LongText
+  imageCID  String?
+  videoCID  String?
+  dealId    Int?        @unique
+  createdAt DateTime    @default(now())
+
+  org   Organization @relation(fields: [orgId], references: [id])
+  celeb Celeb        @relation(fields: [celebId], references: [id])
+  deal  Deal?        @relation(fields: [dealId], references: [id])
 }

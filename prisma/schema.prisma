@@ -89,7 +89,6 @@ model Deal {
   orgRoyaltyReceier String
   done              Boolean @default(false)
   cancelled         Boolean @default(false)
-  proposalId        Int     @unique
 
   org   Organization @relation(fields: [orgId], references: [id])
   celeb Celeb        @relation(fields: [celebAddress], references: [address])

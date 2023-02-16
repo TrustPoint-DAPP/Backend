@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
+import { Socket } from "socket.io";
+import { ExtendedError } from "socket.io/dist/namespace";
 import { verifyJWTToken } from "./helpers";
+import { CustomRequest } from "./interfaces";
 
 const prisma = new PrismaClient();
 
@@ -30,7 +33,7 @@ export async function onlyAuthorized(
   if (!decoded) {
     return res.status(401).json({ message: "Invalid authorization token" });
   }
-  (req as any).userType = decoded.type;
+  (req as CustomRequest).userType = decoded.type;
   if (decoded.type == "ORG") {
     const organization = await prisma.organization.findUnique({
       where: { admin: decoded.username },
@@ -40,7 +43,7 @@ export async function onlyAuthorized(
         message:
           "The organization associated to this authorization token not found",
       });
-    (req as any).organization = organization;
+    (req as CustomRequest).organization = organization;
     return next();
   }
 
@@ -51,7 +54,7 @@ export async function onlyAuthorized(
     return res.status(401).json({
       message: "The celebrity associated to this authorization token not found",
     });
-  (req as any).celeb = celeb;
+  (req as CustomRequest).celeb = celeb;
   return next();
 }
 
@@ -87,4 +90,45 @@ export async function onlyAuthorizedCeleb(
         .json({ message: "The route is only for registered celebrities" });
     next();
   });
+}
+
+export async function onlyAuthenticatedSocket(
+  socket: Socket,
+  next: (err?: ExtendedError | undefined) => void
+) {
+  const token = socket.handshake.headers.token as string;
+  const decoded = verifyJWTToken(token) as {
+    username: string;
+    type: "CELEB" | "ORG";
+  };
+  if (!decoded) return next(new Error("Invalid authorization token"));
+
+  socket.data.userType = decoded.type;
+  if (decoded.type == "ORG") {
+    const organization = await prisma.organization.findUnique({
+      where: { admin: decoded.username },
+    });
+    if (!organization)
+      return next(
+        new Error(
+          "The organization associated to this authorization token not found"
+        )
+      );
+    socket.data.organization = organization;
+
+    return next();
+  }
+
+  const celeb = await prisma.celeb.findUnique({
+    where: { address: decoded.username },
+  });
+  if (!celeb)
+    return next(
+      new Error(
+        "The celebrity associated to this authorization token not found"
+      )
+    );
+
+  socket.data.celeb = celeb;
+  next();
 }

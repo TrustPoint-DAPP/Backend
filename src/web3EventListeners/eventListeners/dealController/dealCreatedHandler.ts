@@ -1,5 +1,6 @@
 import { BlockchainSyncTypes, PrismaClient } from "@prisma/client";
-import { checkAndCreateSync } from "../../../helpers";
+import { chatManagerInstance } from "../../..";
+import { checkAndCreateSync, generateNonce } from "../../../helpers";
 import { DealCreatedEvent } from "../../../typechain-types/contracts/Deal.sol/DealController";
 
 const prisma = new PrismaClient();
@@ -26,6 +27,15 @@ export default async function dealCreatedHandler(
     ))
   )
     return;
+
+  let celeb = await prisma.celeb.findUnique({
+    where: { address: deal.counterParty },
+  });
+  if (!celeb) {
+    celeb = await prisma.celeb.create({
+      data: { address: deal.counterParty, nonce: generateNonce() },
+    });
+  }
 
   // TODO: check if organization and celeb exists in the database or not, if not then create them in the database
 
@@ -60,4 +70,11 @@ export default async function dealCreatedHandler(
       },
     });
   }
+
+  // send deal using web socket
+  await chatManagerInstance.sendDeal(
+    Number(deal.orgId),
+    celeb.id,
+    Number(deal.id)
+  );
 }

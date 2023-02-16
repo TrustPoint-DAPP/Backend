@@ -173,7 +173,7 @@ model Message {
   id        Int         @id @default(autoincrement())
   orgId     Int
   celebId   Int
-  unread    Boolean
+  unread    Boolean     @default(true)
   type      MessageType
   sender    SenderType
   text      String?     @db.LongText

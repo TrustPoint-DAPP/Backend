@@ -7,9 +7,9 @@ import {
   getNonceMessage,
   uploadToIPFS,
   verifySignature,
-} from "../helpers";
+} from "../../helpers";
 import CID from "cids";
-import { file, validate } from "../middlewares";
+import { file, validate } from "../../middlewares";
 
 const orgAuthRouter = Router();
 
@@ -44,7 +44,10 @@ orgAuthRouter.get("/nonce/:address", async (req, res) => {
     nonce = organization.nonce;
   }
 
-  res.json({ message: getNonceMessage(nonce) });
+  res.json({
+    message: getNonceMessage(nonce),
+    registered: organization.registered,
+  });
 });
 
 orgAuthRouter.post(
@@ -143,7 +146,10 @@ orgAuthRouter.post(
 
     const token = generateJWTToken(address, "ORG");
 
-    res.json({ token });
+    res.json({
+      org: await prisma.organization.findUnique({ where: { admin: address } }),
+      token,
+    });
   }
 );
 

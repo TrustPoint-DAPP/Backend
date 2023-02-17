@@ -152,3 +152,17 @@ export function validate(req: Request, res: Response, next: NextFunction) {
   }
   next();
 }
+
+export function handleCors(_req: Request, res: Response, next: NextFunction) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "OPTIONS, GET, POST, PUT, DELETE"
+  );
+  res.setHeader("Access-Control-Max-Age", 2592000); // 30 days
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+  );
+  next();
+}

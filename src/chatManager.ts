@@ -18,7 +18,7 @@ export class ChatManager {
   celebToSocket: Record<number, string[]> = {};
 
   constructor(public server: HttpServer) {
-    this.io = new Server(server);
+    this.io = new Server(server, { cors: { origin: "*" } });
     this.io.use(onlyAuthenticatedSocket);
     this.io.on("connection", this.initialize.bind(this));
   }

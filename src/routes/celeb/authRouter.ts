@@ -7,9 +7,9 @@ import {
   getNonceMessage,
   uploadToIPFS,
   verifySignature,
-} from "../helpers";
+} from "../../helpers";
 import CID from "cids";
-import { file, validate } from "../middlewares";
+import { file, validate } from "../../middlewares";
 
 const celebAuthRouter = Router();
 
@@ -43,7 +43,7 @@ celebAuthRouter.get("/nonce/:address", async (req, res) => {
     nonce = celeb.nonce;
   }
 
-  res.json({ message: getNonceMessage(nonce) });
+  res.json({ message: getNonceMessage(nonce), registered: celeb.registered });
 });
 
 celebAuthRouter.post(
@@ -139,7 +139,10 @@ celebAuthRouter.post(
 
     const token = generateJWTToken(address, "CELEB");
 
-    res.json({ token });
+    res.json({
+      celeb: await prisma.celeb.findUnique({ where: { address } }),
+      token,
+    });
   }
 );
 

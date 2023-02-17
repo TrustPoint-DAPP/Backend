@@ -64,10 +64,8 @@ export async function onlyAuthorizedOrganization(
   next: NextFunction
 ) {
   onlyAuthorized(req, res, () => {
-    const { type } = req as Request & {
-      type: "CELEB" | "ORG";
-    };
-    if (type != "ORG")
+    const { userType } = req as CustomRequest;
+    if (userType != "ORG")
       return res
         .status(401)
         .json({ message: "The route is only for registered organizations" });
@@ -81,10 +79,8 @@ export async function onlyAuthorizedCeleb(
   next: NextFunction
 ) {
   onlyAuthorized(req, res, () => {
-    const { type } = req as Request & {
-      type: "CELEB" | "ORG";
-    };
-    if (type != "CELEB")
+    const { userType } = req as CustomRequest;
+    if (userType != "CELEB")
       return res
         .status(401)
         .json({ message: "The route is only for registered celebrities" });

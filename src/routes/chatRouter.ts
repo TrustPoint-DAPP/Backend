@@ -1,7 +1,19 @@
-import { Celeb, Message, Organization, PrismaClient } from "@prisma/client";
+import {
+  Celeb,
+  Message,
+  MessageType,
+  Organization,
+  PrismaClient,
+  SenderType,
+} from "@prisma/client";
 import { Router } from "express";
+import { chatManagerInstance } from "..";
 import { CustomRequest } from "../interfaces";
-import { onlyAuthorized } from "../protectionMiddlewares";
+import { file, validate } from "../middlewares";
+import {
+  onlyAuthorized,
+  onlyAuthorizedOrganization,
+} from "../protectionMiddlewares";
 
 const chatRouter = Router();
 
@@ -74,5 +86,38 @@ chatRouter.get("/:id", onlyAuthorized, async (req, res) => {
 
   res.json({ messages });
 });
+
+chatRouter.post(
+  "/:id/image",
+  file("image", "image"),
+  validate,
+  async (req, res) => {
+    const image = req.file as Express.Multer.File;
+  }
+);
+
+chatRouter.post(
+  "/initiate/:id",
+  onlyAuthorizedOrganization,
+  async (req, res) => {
+    const { id } = req.params;
+    const { organization } = req as CustomRequest;
+    const celeb = await prisma.celeb.findUnique({ where: { id: Number(id) } });
+    if (!celeb) return res.status(404).json({ message: "celebrity not found" });
+    const totalMessages = await prisma.message.count({
+      where: { celebId: celeb.id, orgId: organization?.id },
+    });
+    if (totalMessages == 0) {
+      await chatManagerInstance.sendTextMessage({
+        userType: "ORG",
+        fromId: organization?.id as number,
+        toId: celeb.id,
+        text: "Hi",
+        type: MessageType.TEXT,
+      });
+    }
+    res.json({ message: "done" });
+  }
+);
 
 export default chatRouter;

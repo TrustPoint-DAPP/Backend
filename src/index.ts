@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import http from "http";
 
@@ -8,12 +9,11 @@ import celebRouter from "./routes/celeb";
 import orgRouter from "./routes/organization";
 import userRouter from "./routes/userRouter";
 import web3EventListeners from "./web3EventListeners";
-import { handleCors } from "./middlewares";
 
 const app = express();
 
 // middlewares
-app.use(handleCors);
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {

@@ -18,7 +18,9 @@ userRouter.get(
     });
     const celeb = await prisma.celeb.findUnique({ where: { address } });
     res.json({
-      registered: Boolean(organization || celeb),
+      registered: Boolean(
+        (organization && organization.registered) || (celeb && celeb.registered)
+      ),
       type:
         organization && organization.registered
           ? "ORG"

@@ -164,7 +164,7 @@ enum MessageType {
 }
 
 enum SenderType {
-  ORGANIZATION
+  ORG
   CELEB
 }
 

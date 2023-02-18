@@ -94,8 +94,7 @@ export class ChatManager {
         celeb: {
           connect: { id: data.userType == "CELEB" ? data.fromId : data.toId },
         },
-        sender:
-          data.userType == "CELEB" ? SenderType.CELEB : SenderType.ORGANIZATION,
+        sender: data.userType == "CELEB" ? SenderType.CELEB : SenderType.ORG,
         type: data.type,
         text: data.text,
         imageCID: data.imageCID,
@@ -119,7 +118,7 @@ export class ChatManager {
       data: {
         org: { connect: { id: orgId } },
         celeb: { connect: { id: celebId } },
-        sender: SenderType.ORGANIZATION,
+        sender: SenderType.ORG,
         type: MessageType.DEAL,
         deal: { connect: { id: dealId } },
       },

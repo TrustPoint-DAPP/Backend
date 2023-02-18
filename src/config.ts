@@ -19,3 +19,12 @@ export const JWT_SECRET = process.env.JWT_SECRET || "";
 export const MIN_BLOCK = Number(process.env.MIN_BLOCK || "0");
 
 export const provider = new ethers.providers.WebSocketProvider(WEB3_RPC_URI);
+
+export async function getDealContractDomain() {
+  return {
+    name: "Deal Controller",
+    version: "1",
+    chainId: CHAIN_ID,
+    verifyingContract: DEAL_CONTRACT_ADDRESS,
+  };
+}

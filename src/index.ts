@@ -9,6 +9,7 @@ import celebRouter from "./routes/celeb";
 import orgRouter from "./routes/organization";
 import userRouter from "./routes/userRouter";
 import web3EventListeners from "./web3EventListeners";
+import dealRouter from "./routes/dealRouter";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/org", orgRouter);
 app.use("/celeb", celebRouter);
 app.use("/user", userRouter);
 app.use("/chat", chatRouter);
+app.use("/deal", dealRouter);
 
 web3EventListeners();
 

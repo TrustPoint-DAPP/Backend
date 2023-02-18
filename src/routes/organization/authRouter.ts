@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import {
   generateJWTToken,
   generateNonce,
@@ -15,40 +15,45 @@ const orgAuthRouter = Router();
 
 const prisma = new PrismaClient();
 
-orgAuthRouter.get("/nonce/:address", async (req, res) => {
-  const { address } = req.params;
+orgAuthRouter.get(
+  "/nonce/:address",
+  param("address").isEthereumAddress(),
+  validate,
+  async (req, res) => {
+    const { address } = req.params;
 
-  // check if celeb account is there with the same address
-  const celeb = await prisma.celeb.findFirst({
-    where: { address, registered: true },
-  });
-  if (celeb)
-    return res
-      .status(400)
-      .json({ message: "a celebrity account exists with this address" });
-
-  let organization = await prisma.organization.findUnique({
-    where: { admin: address },
-  });
-
-  let nonce;
-  if (!organization) {
-    nonce = generateNonce();
-    organization = await prisma.organization.create({
-      data: {
-        admin: address,
-        nonce,
-      },
+    // check if celeb account is there with the same address
+    const celeb = await prisma.celeb.findFirst({
+      where: { address, registered: true },
     });
-  } else {
-    nonce = organization.nonce;
-  }
+    if (celeb)
+      return res
+        .status(400)
+        .json({ message: "a celebrity account exists with this address" });
 
-  res.json({
-    message: getNonceMessage(nonce),
-    registered: organization.registered,
-  });
-});
+    let organization = await prisma.organization.findUnique({
+      where: { admin: address },
+    });
+
+    let nonce;
+    if (!organization) {
+      nonce = generateNonce();
+      organization = await prisma.organization.create({
+        data: {
+          admin: address,
+          nonce,
+        },
+      });
+    } else {
+      nonce = organization.nonce;
+    }
+
+    res.json({
+      message: getNonceMessage(nonce),
+      registered: organization.registered,
+    });
+  }
+);
 
 orgAuthRouter.post(
   "/register",

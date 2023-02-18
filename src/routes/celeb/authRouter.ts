@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import {
   generateJWTToken,
   generateNonce,
@@ -15,36 +15,41 @@ const celebAuthRouter = Router();
 
 const prisma = new PrismaClient();
 
-celebAuthRouter.get("/nonce/:address", async (req, res) => {
-  const { address } = req.params;
+celebAuthRouter.get(
+  "/nonce/:address",
+  param("address").isEthereumAddress(),
+  validate,
+  async (req, res) => {
+    const { address } = req.params;
 
-  // check if organization account is there with the same address
-  const organization = await prisma.organization.findFirst({
-    where: { admin: address, registered: true },
-  });
-  if (organization)
-    return res
-      .status(400)
-      .json({ message: "a organization account exists with this address" });
-
-  let celeb = await prisma.celeb.findUnique({
-    where: { address },
-  });
-  let nonce;
-  if (!celeb) {
-    nonce = generateNonce();
-    celeb = await prisma.celeb.create({
-      data: {
-        address,
-        nonce,
-      },
+    // check if organization account is there with the same address
+    const organization = await prisma.organization.findFirst({
+      where: { admin: address, registered: true },
     });
-  } else {
-    nonce = celeb.nonce;
-  }
+    if (organization)
+      return res
+        .status(400)
+        .json({ message: "a organization account exists with this address" });
 
-  res.json({ message: getNonceMessage(nonce), registered: celeb.registered });
-});
+    let celeb = await prisma.celeb.findUnique({
+      where: { address },
+    });
+    let nonce;
+    if (!celeb) {
+      nonce = generateNonce();
+      celeb = await prisma.celeb.create({
+        data: {
+          address,
+          nonce,
+        },
+      });
+    } else {
+      nonce = celeb.nonce;
+    }
+
+    res.json({ message: getNonceMessage(nonce), registered: celeb.registered });
+  }
+);
 
 celebAuthRouter.post(
   "/register",

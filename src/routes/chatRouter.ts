@@ -7,6 +7,7 @@ import {
   SenderType,
 } from "@prisma/client";
 import { Router } from "express";
+import { param } from "express-validator";
 import { chatManagerInstance } from "..";
 import { CustomRequest } from "../interfaces";
 import { file, validate } from "../middlewares";
@@ -61,31 +62,40 @@ chatRouter.get("/", onlyAuthorized, async (req, res) => {
   res.json({ messages });
 });
 
-chatRouter.get("/:id", onlyAuthorized, async (req, res) => {
-  const { userType, celeb, organization } = req as CustomRequest;
-  const { id } = req.params;
+chatRouter.get(
+  "/:id",
+  onlyAuthorized,
+  param("id").isNumeric(),
+  validate,
+  async (req, res) => {
+    const { userType, celeb, organization } = req as CustomRequest;
+    const { id } = req.params;
 
-  let messages: Message[];
+    let messages: Message[];
 
-  if (userType == "ORG") {
-    const celeb = await prisma.celeb.findUnique({ where: { id: Number(id) } });
-    if (!celeb) return res.status(404).json({ message: "celebrity not found" });
-    messages = await prisma.message.findMany({
-      where: { orgId: organization?.id, celebId: Number(id) },
-    });
-  } else {
-    const org = await prisma.organization.findUnique({
-      where: { id: Number(id) },
-    });
-    if (!org)
-      return res.status(404).json({ message: "organization not found" });
-    messages = await prisma.message.findMany({
-      where: { orgId: Number(id), celebId: celeb?.id },
-    });
+    if (userType == "ORG") {
+      const celeb = await prisma.celeb.findUnique({
+        where: { id: Number(id) },
+      });
+      if (!celeb)
+        return res.status(404).json({ message: "celebrity not found" });
+      messages = await prisma.message.findMany({
+        where: { orgId: organization?.id, celebId: Number(id) },
+      });
+    } else {
+      const org = await prisma.organization.findUnique({
+        where: { id: Number(id) },
+      });
+      if (!org)
+        return res.status(404).json({ message: "organization not found" });
+      messages = await prisma.message.findMany({
+        where: { orgId: Number(id), celebId: celeb?.id },
+      });
+    }
+
+    res.json({ messages });
   }
-
-  res.json({ messages });
-});
+);
 
 chatRouter.post(
   "/:id/image",
@@ -99,6 +109,8 @@ chatRouter.post(
 chatRouter.post(
   "/initiate/:id",
   onlyAuthorizedOrganization,
+  param("id").isNumeric(),
+  validate,
   async (req, res) => {
     const { id } = req.params;
     const { organization } = req as CustomRequest;

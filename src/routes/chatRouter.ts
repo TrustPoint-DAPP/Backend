@@ -81,6 +81,9 @@ chatRouter.get(
         return res.status(404).json({ message: "celebrity not found" });
       messages = await prisma.message.findMany({
         where: { orgId: organization?.id, celebId: Number(id) },
+        include: {
+          deal: { include: { nfts: { include: { metadata: true } } } },
+        },
       });
     } else {
       const org = await prisma.organization.findUnique({
@@ -90,6 +93,9 @@ chatRouter.get(
         return res.status(404).json({ message: "organization not found" });
       messages = await prisma.message.findMany({
         where: { orgId: Number(id), celebId: celeb?.id },
+        include: {
+          deal: { include: { nfts: { include: { metadata: true } } } },
+        },
       });
     }
 

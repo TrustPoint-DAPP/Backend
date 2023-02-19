@@ -4,17 +4,19 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
+    "dev": "concurrently \"tsc --watch\" \"nodemon -q dist/index.js\"",
     "dev:js": "nodemon -q dist/index.js",
-    "migrate": "prisma migrate dev --name init",
+    "migrate": "prisma migrate",
     "generate": "prisma generate",
     "studio": "prisma studio",
-    "watch": "npx tsc --watch"
+    "watch": "tsc --watch",
+    "build": "tsc"
   },
   "dependencies": {
     "@epnsproject/backend-sdk-staging": "^2.0.3",
     "@lighthouse-web3/sdk": "^0.1.12",
     "@prisma/client": "4.9.0",
+    "axios": "^1.3.3",
     "cids": "^1.1.9",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

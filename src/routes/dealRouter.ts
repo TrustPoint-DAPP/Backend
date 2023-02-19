@@ -24,7 +24,9 @@ dealRouter.post(
   async (req, res) => {
     const organization = (req as CustomRequest).organization as Organization;
     const { celebRoyalty, orgRoyalty, oneOffFees, celebId } = req.body;
-    const celeb = await prisma.celeb.findUnique({ where: { id: celebId } });
+    const celeb = await prisma.celeb.findUnique({
+      where: { id: Number(celebId) },
+    });
     if (!celeb) return res.status(404).json({ message: "Celeb not found" });
     const metadataFile = req.file as Express.Multer.File;
     let jsonFileData;

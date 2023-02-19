@@ -14,5 +14,5 @@ COPY prisma ./prisma
 ENV NODE_ENV=development
 RUN yarn migrate dev
 RUN yarn build -b
-EXPOSE 8000
+EXPOSE $PORT
 CMD [ "node", "--experimental-json-modules", "dist/index.js" ]

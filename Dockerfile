@@ -9,7 +9,6 @@ RUN yarn install
 
 COPY src ./src
 COPY tsconfig.json .
-COPY .env .env
 COPY prisma ./prisma
 ENV NODE_ENV=development
 RUN yarn migrate dev

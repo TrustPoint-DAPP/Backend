@@ -10,6 +10,7 @@ import orgRouter from "./routes/organization";
 import userRouter from "./routes/userRouter";
 import web3EventListeners from "./web3EventListeners";
 import dealRouter from "./routes/dealRouter";
+import nftRouter from "./routes/nftRouter";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/celeb", celebRouter);
 app.use("/user", userRouter);
 app.use("/chat", chatRouter);
 app.use("/deal", dealRouter);
+app.use("/nft", nftRouter);
 
 web3EventListeners();
 

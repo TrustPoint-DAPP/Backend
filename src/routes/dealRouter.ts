@@ -1,9 +1,12 @@
 import { Organization, PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { CustomRequest } from "../interfaces";
 import { file, validate } from "../middlewares";
-import { onlyAuthorizedOrganization } from "../protectionMiddlewares";
+import {
+  onlyAuthorized,
+  onlyAuthorizedOrganization,
+} from "../protectionMiddlewares";
 import Validator from "validatorjs";
 import { uploadJSONtoIPFS } from "../helpers";
 import CID from "cids";
@@ -11,6 +14,24 @@ import { signForDealCreation } from "../signatures";
 
 const dealRouter = Router();
 const prisma = new PrismaClient();
+
+dealRouter.get("/", onlyAuthorized, validate, async (req, res) => {
+  const { organization, celeb } = req as CustomRequest;
+  const deals = await prisma.deal.findMany({
+    where: { orgId: organization?.id, celebAddress: celeb?.address },
+    include: { nfts: { include: { metadata: true } }, celeb: true, org: true },
+  });
+  res.json({ deals });
+});
+
+dealRouter.get("/:id", param("id").isNumeric(), validate, async (req, res) => {
+  const { id } = req.params;
+  const deal = await prisma.deal.findUnique({
+    where: { id: Number(id) },
+    include: { nfts: { include: { metadata: true } }, celeb: true, org: true },
+  });
+  if (!deal) return res.status(404).json({ message: "deal not found" });
+});
 
 dealRouter.post(
   "/",

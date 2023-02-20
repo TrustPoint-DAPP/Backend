@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18-alpine as BUILD_IMAGE
 
 WORKDIR /app
 
@@ -10,8 +10,18 @@ RUN yarn install
 COPY src ./src
 COPY tsconfig.json .
 COPY prisma ./prisma
-ENV NODE_ENV=development
-RUN yarn migrate dev
+
+RUN yarn generate
 RUN yarn build -b
-EXPOSE $PORT
-CMD [ "node", "--experimental-json-modules", "dist/index.js" ]
+RUN npm prune --production
+
+FROM node:18-alpine
+
+EXPOSE 8000
+CMD [ "node", "dist/index.js" ]
+
+WORKDIR /app
+
+# copy from build image
+COPY --from=BUILD_IMAGE /app/dist ./dist
+COPY --from=BUILD_IMAGE /app/node_modules ./node_modules

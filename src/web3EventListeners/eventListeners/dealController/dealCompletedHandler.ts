@@ -7,8 +7,14 @@ const prisma = new PrismaClient();
 export default async function dealCompletedHandler(
   eventEmitted: DealCompletedEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { dealId, nftIds, tokenIds, royaltyReceivers } = args;
 
   const dealObj = await prisma.deal.findUnique({
@@ -26,6 +32,7 @@ export default async function dealCompletedHandler(
     ))
   )
     return;
+  console.log(event);
 
   for (let i = 0; i < nftIds.length; i++) {
     const nftId = Number(nftIds[i]);

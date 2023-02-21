@@ -7,8 +7,14 @@ const prisma = new PrismaClient();
 export default async function createOrganizationHandler(
   eventEmitted: CreateOrganizationEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { orgId, adminAddress, nftContract } = args;
 
   if (
@@ -21,6 +27,7 @@ export default async function createOrganizationHandler(
     ))
   )
     return;
+  console.log(event);
 
   await prisma.organization.update({
     where: { id: Number(orgId) },

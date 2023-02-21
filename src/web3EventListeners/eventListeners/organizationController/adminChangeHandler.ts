@@ -7,8 +7,14 @@ const prisma = new PrismaClient();
 export default async function adminChangeHandler(
   eventEmitted: AdminUpdatedEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { orgId, oldAdmin, newAdmin } = args;
 
   if (
@@ -21,6 +27,7 @@ export default async function adminChangeHandler(
     ))
   )
     return;
+  console.log(event);
 
   const organization = await prisma.organization.findUnique({
     where: { id: Number(orgId) },

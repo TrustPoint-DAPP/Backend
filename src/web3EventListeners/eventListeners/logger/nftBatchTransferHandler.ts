@@ -11,8 +11,14 @@ const prisma = new PrismaClient();
 export default async function nftBatchTransferHandler(
   eventEmitted: TransferBatchEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { contractAddress, from, to, ids, values } = args;
 
   const organization = await prisma.organization.findUnique({
@@ -30,6 +36,7 @@ export default async function nftBatchTransferHandler(
     ))
   )
     return;
+  console.log(event);
 
   for (let i = 0; i < ids.length; i++) {
     const id = ids[i];

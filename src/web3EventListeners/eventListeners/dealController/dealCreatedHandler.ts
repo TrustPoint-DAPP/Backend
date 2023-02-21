@@ -8,8 +8,14 @@ const prisma = new PrismaClient();
 export default async function dealCreatedHandler(
   eventEmitted: DealCreatedEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { deal, nfts } = args;
 
   const dealObj = await prisma.deal.findUnique({
@@ -27,6 +33,7 @@ export default async function dealCreatedHandler(
     ))
   )
     return;
+  console.log(event);
 
   let celeb = await prisma.celeb.findUnique({
     where: { address: deal.counterParty },

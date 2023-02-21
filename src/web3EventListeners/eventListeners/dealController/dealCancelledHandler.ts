@@ -7,8 +7,14 @@ const prisma = new PrismaClient();
 export default async function dealCancelledHandler(
   eventEmitted: DealCancelledEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { dealId } = args;
 
   const dealObj = await prisma.deal.findUnique({
@@ -26,6 +32,7 @@ export default async function dealCancelledHandler(
     ))
   )
     return;
+  console.log(event);
 
   await prisma.deal.update({
     where: {

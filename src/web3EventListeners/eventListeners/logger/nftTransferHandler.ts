@@ -11,8 +11,14 @@ const prisma = new PrismaClient();
 export default async function nftTransferHandler(
   eventEmitted: TransferSingleEvent
 ) {
-  const { blockNumber, transactionHash, transactionIndex, logIndex, args } =
-    eventEmitted;
+  const {
+    blockNumber,
+    transactionHash,
+    transactionIndex,
+    logIndex,
+    event,
+    args,
+  } = eventEmitted;
   const { contractAddress, from, to, id, value } = args;
 
   const organization = await prisma.organization.findUnique({
@@ -30,6 +36,7 @@ export default async function nftTransferHandler(
     ))
   )
     return;
+  console.log(event);
 
   const nft = await prisma.nft.findUnique({ where: { tokenId: Number(id) } });
   if (nft && from == "0x0000000000000000000000000000000000000000") {

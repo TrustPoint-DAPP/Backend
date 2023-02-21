@@ -122,7 +122,11 @@ export class ChatManager {
         type: MessageType.DEAL,
         deal: { connect: { id: dealId } },
       },
-      include: { org: true, celeb: true, deal: true },
+      include: {
+        org: true,
+        celeb: true,
+        deal: { include: { nfts: { include: { metadata: true } } } },
+      },
     });
 
     allSockets.forEach((socketId) => {
